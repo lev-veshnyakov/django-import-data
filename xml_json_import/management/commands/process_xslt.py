@@ -2,6 +2,7 @@ from django.core.management.base import BaseCommand
 from lxml import etree, html
 import urllib2
 from os import path
+import importlib
 
 class Command(BaseCommand):
     help = 'Processes XSLT transformation on a fetched by URL resource and outputs the result'
@@ -15,6 +16,11 @@ class Command(BaseCommand):
         parser.add_argument('--rng_file', default=rng_file,
                              help='Path to RELAX NG file. Defaults to schema.rng in module dir. '
                                   'Used only if --validate is set')
+        parser.add_argument('--save', action='store_true', 
+                             help='Save data to the model. Successful validation against Relax NG '
+                                  'schema is required. Model names and fields in transformed XML '
+                                  'must represent existing models and fields. Otherwise import '
+                                  'will break with an exception')
 
     def handle(self, *args, **options):
         response = urllib2.urlopen(options['url'])
@@ -29,11 +35,25 @@ class Command(BaseCommand):
         transformed_etree = transform(source_etree)
         output = etree.tostring(transformed_etree, pretty_print=True, encoding=encoding)
         print '<?xml version="1.0" encoding="' + encoding + '"?>\n' + output
-        if options['validate']:
+        if options['validate'] or options['save']:
             rng_file_etree = etree.parse(options['rng_file'])
             relaxng = etree.RelaxNG(rng_file_etree)
             try:
                 relaxng.assertValid(transformed_etree)
                 print 'Document is valid'
+                if options['save']:
+                    saved_objects_count = 0
+                    for model_element in transformed_etree.xpath('//model'):
+                        application_name, model_name = model_element.attrib['model'].split('.')
+                        models_import_str = application_name + '.models'
+                        models = importlib.import_module(models_import_str)
+                        model = getattr(models, model_name)
+                        for item_element in model_element.xpath('.//item'):
+                            obj = model()
+                            for field_element in item_element.xpath('.//field'):
+                                setattr(obj, field_element.attrib['name'], field_element.text)
+                            obj.save()
+                            saved_objects_count += 1
+                    print 'Saved objects: ' + str(saved_objects_count)
             except etree.DocumentInvalid as ex:
                 print 'Document is not valid: ' + str(ex)
