@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+     This RELAX NG schema is used for validating resulting XML files obtaining
+     after XSLT transformation of input data 
+ -->
+<element name="mapping" xmlns="http://relaxng.org/ns/structure/1.0">
+    <oneOrMore>
+        <element name="model">
+            <attribute name="model">
+                <text/>
+            </attribute>
+            <oneOrMore>
+                <element name="item">
+                    <attribute name="key">
+                        <text/>
+                    </attribute>
+                    <interleave>
+                        <oneOrMore>
+                            <element name="field">
+                                <attribute name="name">
+                                        <text/>
+                                </attribute>
+                                <text/>
+                            </element>
+                        </oneOrMore>
+                        <zeroOrMore>
+                            <element name="fk">
+                                <attribute name="model">
+                                    <text/>
+                                </attribute>
+                                <attribute name="key">
+                                    <text/>
+                                </attribute>
+                            </element>
+                        </zeroOrMore>
+                    </interleave>
+                </element>
+            </oneOrMore>
+        </element>
+    </oneOrMore>
+    <zeroOrMore>
+        <element name="m2m-relation">
+            <attribute name="table">
+                <text/>
+            </attribute>
+            <element name="fk-1">
+                <attribute name="name">
+                    <text/>
+                </attribute>
+                <attribute name="value">
+                    <text/>
+                </attribute>
+            </element>
+            <element name="fk-2">
+                <attribute name="name">
+                    <text/>
+                </attribute>
+                <attribute name="value">
+                    <text/>
+                </attribute>
+            </element>
+        </element>
+    </zeroOrMore>
+</element>
