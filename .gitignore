@@ -1,0 +1,5 @@
+/*
+/*/
+*.pyc
+!/xml_json_import/
+!/.gitignore
