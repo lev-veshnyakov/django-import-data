@@ -39,15 +39,18 @@ class Command(BaseCommand):
                         for item_element in self.get_item_elements(model_element):
                             obj = model()
                             for field_element in self.get_field_elements(item_element):
+                                if field_element.attrib.get('unique') and not self.is_unique(model, field_element):
+                                    break
                                 setattr(obj, field_element.attrib['name'], field_element.text)
-                            for fk_element in self.get_fk_elements(item_element):
-                                related_obj = self.save_related_item(fk_element)
-                                self.set_related(obj, related_obj)
-                            obj.save()
-                            for m2m_element in self.get_m2m_elements(item_element):
-                                related_obj = self.save_related_item(m2m_element)
-                                self.set_related(obj, related_obj)
-                            saved_objects_count += 1
+                            else:
+                                for fk_element in self.get_fk_elements(item_element):
+                                    related_obj = self.save_related_item(fk_element)
+                                    self.set_related(obj, related_obj)
+                                obj.save()
+                                for m2m_element in self.get_m2m_elements(item_element):
+                                    related_obj = self.save_related_item(m2m_element)
+                                    self.set_related(obj, related_obj)
+                                saved_objects_count += 1
                     print 'Saved objects: ' + str(saved_objects_count)
             except etree.DocumentInvalid as ex:
                 print 'Document is not valid: ' + str(ex)
@@ -160,4 +163,14 @@ class Command(BaseCommand):
         rng_file_etree = etree.parse(rng_file_path)
         relaxng = etree.RelaxNG(rng_file_etree)
         relaxng.assertValid(transformed_etree)
+    
+    def is_unique(self, model, field_element):
+        '''
+        Checks uniqueness of given field_element value after it will
+        be saved in the database
         
+        This straightforward check lets to avoid duplicates in the database
+        without need to set unique constraints there
+        '''
+        params = {field_element.attrib['name']: field_element.text}
+        return not model.objects.filter(**params).count()

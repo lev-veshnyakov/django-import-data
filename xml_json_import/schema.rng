@@ -20,6 +20,11 @@
                                 <attribute name="name">
                                         <text/>
                                 </attribute>
+                                <optional>
+                                    <attribute name="unique">
+                                        <value>true</value>
+                                    </attribute>
+                                </optional>
                                 <text/>
                             </element>
                         </oneOrMore>
