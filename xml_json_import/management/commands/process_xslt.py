@@ -3,6 +3,7 @@ from lxml import etree, html
 import urllib2
 from os import path
 import importlib
+from django.db.models.fields import related
 
 class Command(BaseCommand):
     help = 'Processes XSLT transformation on a fetched by URL resource and outputs the result'
@@ -43,6 +44,9 @@ class Command(BaseCommand):
                                 related_obj = self.save_related_item(fk_element)
                                 self.set_related(obj, related_obj)
                             obj.save()
+                            for m2m_element in self.get_m2m_elements(item_element):
+                                related_obj = self.save_related_item(m2m_element)
+                                self.set_related(obj, related_obj)
                             saved_objects_count += 1
                     print 'Saved objects: ' + str(saved_objects_count)
             except etree.DocumentInvalid as ex:
@@ -86,6 +90,9 @@ class Command(BaseCommand):
         
     def get_fk_elements(self, item_element):
         return item_element.xpath('.//fk')
+    
+    def get_m2m_elements(self, item_element):
+        return item_element.xpath('.//m2mk')
         
     def save_related_item(self, fk_element):
         '''
@@ -113,7 +120,10 @@ class Command(BaseCommand):
             in type(obj)._meta.get_fields()
             if field.related_model == type(related_obj)
         ][0]
-        setattr(obj, fk_field.name, related_obj)
+        if type(fk_field) is related.ForeignKey:
+            setattr(obj, fk_field.name, related_obj)
+        else:
+            getattr(obj, fk_field.name).add(related_obj)
         
     def load_source_by_url(self, url):
         '''
