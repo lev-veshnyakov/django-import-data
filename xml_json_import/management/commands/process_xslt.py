@@ -28,10 +28,9 @@ class Command(BaseCommand):
         output = etree.tostring(transformed_etree, pretty_print=True, encoding=encoding)
         print '<?xml version="1.0" encoding="' + encoding + '"?>\n' + output
         if options['validate'] or options['save']:
-            rng_file_etree = etree.parse(options['rng_file'])
-            relaxng = etree.RelaxNG(rng_file_etree)
+            
             try:
-                relaxng.assertValid(transformed_etree)
+                self.assert_valid_rng_schema(transformed_etree, options['rng_file'])
                 print 'Document is valid'
                 if options['save']:
                     saved_objects_count = 0
@@ -142,3 +141,14 @@ class Command(BaseCommand):
         transform = etree.XSLT(xslt_etree)
         transformed_etree = transform(source_etree)
         return transformed_etree
+        
+    def assert_valid_rng_schema(self, transformed_etree, rng_file_path):
+        '''
+        Validates source XML against given Relax NG schema
+        
+        If validation falls raises an etree.DocumentInvalid exception
+        '''
+        rng_file_etree = etree.parse(rng_file_path)
+        relaxng = etree.RelaxNG(rng_file_etree)
+        relaxng.assertValid(transformed_etree)
+        
