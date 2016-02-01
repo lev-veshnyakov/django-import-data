@@ -52,6 +52,23 @@ class Command(BaseCommand):
                             obj = model()
                             for field_element in item_element.xpath('.//field'):
                                 setattr(obj, field_element.attrib['name'], field_element.text)
+                            for fk_element in item_element.xpath('.//fk'):
+                                fk_item_element_selector = '//model[@model="{}"]//item[@key="{}"]'.format(
+                                    fk_element.attrib['model'], 
+                                    fk_element.attrib['key']
+                                )
+                                _application_name, _model_name = fk_element.attrib['model'].split('.')
+                                _models_import_str = _application_name + '.models'
+                                _models = importlib.import_module(_models_import_str)
+                                _model = getattr(_models, _model_name)
+                                fk_obj = _model()
+                                fk_item_element = transformed_etree.xpath(fk_item_element_selector)[0]
+                                for field_element in fk_item_element.xpath('.//field'):
+                                    setattr(fk_obj, field_element.attrib['name'], field_element.text)
+                                fk_obj.save()
+                                for field in model._meta.get_fields():
+                                    if field.related_model == _model:
+                                        setattr(obj, field.name, fk_obj)
                             obj.save()
                             saved_objects_count += 1
                     print 'Saved objects: ' + str(saved_objects_count)
