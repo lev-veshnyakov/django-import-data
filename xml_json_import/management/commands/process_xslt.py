@@ -51,11 +51,7 @@ class Command(BaseCommand):
                                 setattr(obj, field_element.attrib['name'], field_element.text)
                             for fk_element in self.get_fk_elements(item_element):
                                 fk_model = self.get_model(fk_element.attrib['model'])
-                                fk_obj = fk_model()
-                                related_element = self.get_related_item_element(fk_element)
-                                for field_element in related_element.xpath('.//field'):
-                                    setattr(fk_obj, field_element.attrib['name'], field_element.text)
-                                fk_obj.save()
+                                fk_obj = self.save_related_item(fk_element)
                                 for field in model._meta.get_fields():
                                     if field.related_model == fk_model:
                                         setattr(obj, field.name, fk_obj)
@@ -103,3 +99,15 @@ class Command(BaseCommand):
         
     def get_fk_elements(self, item_element):
         return item_element.xpath('.//fk')
+        
+    def save_related_item(self, fk_element):
+        '''
+        Finds and saves related <item /> element by given <fk /> element
+        '''
+        fk_model = self.get_model(fk_element.attrib['model'])
+        obj = fk_model()
+        related_element = self.get_related_item_element(fk_element)
+        for field_element in self.get_related_item_element(fk_element):
+            setattr(obj, field_element.attrib['name'], field_element.text)
+        obj.save()
+        return obj
