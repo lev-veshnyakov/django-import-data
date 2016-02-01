@@ -41,7 +41,7 @@ class Command(BaseCommand):
                             for field_element in self.get_field_elements(item_element):
                                 if field_element.attrib.get('unique') and not self.is_unique(model, field_element):
                                     break
-                                setattr(obj, field_element.attrib['name'], field_element.text)
+                                setattr(obj, field_element.attrib['name'], field_element.text.strip())
                             else:
                                 for fk_element in self.get_fk_elements(item_element):
                                     related_obj = self.save_related_item(fk_element)
@@ -105,7 +105,7 @@ class Command(BaseCommand):
         obj = fk_model()
         related_item_element = self.get_related_item_element(fk_element)
         for field_element in self.get_field_elements(related_item_element):
-            setattr(obj, field_element.attrib['name'], field_element.text)
+            setattr(obj, field_element.attrib['name'], field_element.text.strip())
         obj.save()
         return obj
         
