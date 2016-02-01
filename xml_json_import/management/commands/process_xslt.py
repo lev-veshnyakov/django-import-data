@@ -43,13 +43,13 @@ class Command(BaseCommand):
                 print 'Document is valid'
                 if options['save']:
                     saved_objects_count = 0
-                    for model_element in transformed_etree.xpath('//model'):
+                    for model_element in self.get_model_elements(transformed_etree):
                         model = self.get_model(model_element.attrib['model'])
-                        for item_element in model_element.xpath('.//item'):
+                        for item_element in self.get_item_elements(model_element):
                             obj = model()
-                            for field_element in item_element.xpath('.//field'):
+                            for field_element in self.get_field_elements(item_element):
                                 setattr(obj, field_element.attrib['name'], field_element.text)
-                            for fk_element in item_element.xpath('.//fk'):
+                            for fk_element in self.get_fk_elements(item_element):
                                 fk_model = self.get_model(fk_element.attrib['model'])
                                 fk_obj = fk_model()
                                 related_element = self.get_related_item_element(fk_element)
@@ -91,3 +91,15 @@ class Command(BaseCommand):
         )
         fk_item_element = fk_element.xpath(fk_item_element_selector)[0]
         return fk_item_element
+        
+    def get_model_elements(self, transformed_etree):
+        return transformed_etree.xpath('//model')
+        
+    def get_item_elements(self, model_element):
+        return model_element.xpath('.//item')
+        
+    def get_field_elements(self, item_element):
+        return item_element.xpath('.//field')
+        
+    def get_fk_elements(self, item_element):
+        return item_element.xpath('.//fk')
