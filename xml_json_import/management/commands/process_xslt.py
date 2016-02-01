@@ -93,8 +93,8 @@ class Command(BaseCommand):
         '''
         fk_model = self.get_model(fk_element.attrib['model'])
         obj = fk_model()
-        related_element = self.get_related_item_element(fk_element)
-        for field_element in self.get_related_item_element(fk_element):
+        related_item_element = self.get_related_item_element(fk_element)
+        for field_element in self.get_field_elements(related_item_element):
             setattr(obj, field_element.attrib['name'], field_element.text)
         obj.save()
         return obj
