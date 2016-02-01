@@ -50,11 +50,8 @@ class Command(BaseCommand):
                             for field_element in self.get_field_elements(item_element):
                                 setattr(obj, field_element.attrib['name'], field_element.text)
                             for fk_element in self.get_fk_elements(item_element):
-                                fk_model = self.get_model(fk_element.attrib['model'])
-                                fk_obj = self.save_related_item(fk_element)
-                                for field in model._meta.get_fields():
-                                    if field.related_model == fk_model:
-                                        setattr(obj, field.name, fk_obj)
+                                related_obj = self.save_related_item(fk_element)
+                                self.set_related(obj, related_obj)
                             obj.save()
                             saved_objects_count += 1
                     print 'Saved objects: ' + str(saved_objects_count)
@@ -111,3 +108,19 @@ class Command(BaseCommand):
             setattr(obj, field_element.attrib['name'], field_element.text)
         obj.save()
         return obj
+        
+    def set_related(self, obj, related_obj):
+        '''
+        Finds and saves related model object
+        
+        It finds appropriate foreign key by related
+        objects type. It means that you can't use 
+        two different foreign key fields to the same model
+        '''
+        fk_field = [
+            field 
+            for field 
+            in type(obj)._meta.get_fields() 
+            if field.related_model == type(related_obj)
+        ][0]
+        setattr(obj, fk_field.name, related_obj)
