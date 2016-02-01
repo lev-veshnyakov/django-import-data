@@ -50,14 +50,10 @@ class Command(BaseCommand):
                             for field_element in item_element.xpath('.//field'):
                                 setattr(obj, field_element.attrib['name'], field_element.text)
                             for fk_element in item_element.xpath('.//fk'):
-                                fk_item_element_selector = '//model[@model="{}"]//item[@key="{}"]'.format(
-                                    fk_element.attrib['model'], 
-                                    fk_element.attrib['key']
-                                )
                                 fk_model = self.get_model(fk_element.attrib['model'])
                                 fk_obj = fk_model()
-                                fk_item_element = transformed_etree.xpath(fk_item_element_selector)[0]
-                                for field_element in fk_item_element.xpath('.//field'):
+                                related_element = self.get_related_item_element(fk_element)
+                                for field_element in related_element.xpath('.//field'):
                                     setattr(fk_obj, field_element.attrib['name'], field_element.text)
                                 fk_obj.save()
                                 for field in model._meta.get_fields():
@@ -81,3 +77,17 @@ class Command(BaseCommand):
         models = importlib.import_module(models_import_str)
         model = getattr(models, model_name)
         return model
+        
+    def get_related_item_element(self, fk_element):
+        '''
+        Returns related element by its foreign key
+        
+        It takes <fk /> element and finds related <item />
+        element by attributes
+        '''
+        fk_item_element_selector = '//model[@model="{}"]//item[@key="{}"]'.format(
+            fk_element.attrib['model'], 
+            fk_element.attrib['key']
+        )
+        fk_item_element = fk_element.xpath(fk_item_element_selector)[0]
+        return fk_item_element
