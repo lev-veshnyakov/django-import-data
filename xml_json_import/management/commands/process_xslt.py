@@ -26,9 +26,8 @@ class Command(BaseCommand):
         source_etree, encoding = self.load_source_by_url(options['url'])
         transformed_etree = self.xslt_transform(source_etree, options['xslt_file'])
         output = etree.tostring(transformed_etree, pretty_print=True, encoding=encoding)
-        print '<?xml version="1.0" encoding="' + encoding + '"?>\n' + output
+        print '<?xml version="1.0" encoding="' + (encoding or '') + '"?>\n' + output
         if options['validate'] or options['save']:
-            
             try:
                 self.assert_valid_rng_schema(transformed_etree, options['rng_file'])
                 print 'Document is valid'
