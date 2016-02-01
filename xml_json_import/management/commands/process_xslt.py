@@ -24,9 +24,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         source_etree, encoding = self.load_source_by_url(options['url'])
-        xslt_etree = etree.parse(options['xslt_file'])
-        transform = etree.XSLT(xslt_etree)
-        transformed_etree = transform(source_etree)
+        transformed_etree = self.xslt_transform(source_etree, options['xslt_file'])
         output = etree.tostring(transformed_etree, pretty_print=True, encoding=encoding)
         print '<?xml version="1.0" encoding="' + encoding + '"?>\n' + output
         if options['validate'] or options['save']:
@@ -135,3 +133,12 @@ class Command(BaseCommand):
         else:
             raise Exception('Unsupported content type for source URL ' + url)
         return source_etree, encoding
+        
+    def xslt_transform(self, source_etree, xslt_file_path):
+        '''
+        Transforms source XML by given XSLT file
+        '''
+        xslt_etree = etree.parse(xslt_file_path)
+        transform = etree.XSLT(xslt_etree)
+        transformed_etree = transform(source_etree)
+        return transformed_etree
