@@ -23,13 +23,7 @@ class Command(BaseCommand):
                                   'will break with an exception')
 
     def handle(self, *args, **options):
-        response = urllib2.urlopen(options['url'])
-        encoding = response.headers.getparam('charset')
-        content_type = response.info().type
-        if 'xml' in content_type:
-            source_etree = etree.parse(response)
-        elif 'html' in content_type:
-            source_etree = html.parse(response)
+        source_etree, encoding = self.load_source_by_url(options['url'])
         xslt_etree = etree.parse(options['xslt_file'])
         transform = etree.XSLT(xslt_etree)
         transformed_etree = transform(source_etree)
@@ -120,7 +114,24 @@ class Command(BaseCommand):
         fk_field = [
             field 
             for field 
-            in type(obj)._meta.get_fields() 
+            in type(obj)._meta.get_fields()
             if field.related_model == type(related_obj)
         ][0]
         setattr(obj, fk_field.name, related_obj)
+        
+    def load_source_by_url(self, url):
+        '''
+        Gets soure etree and content encoding by given url
+        
+        file:// schema is also supported
+        '''
+        response = urllib2.urlopen(url)
+        encoding = response.headers.getparam('charset')
+        content_type = response.info().type
+        if 'xml' in content_type:
+            source_etree = etree.parse(response)
+        elif 'html' in content_type:
+            source_etree = html.parse(response)
+        else:
+            raise Exception('Unsupported content type for source URL ' + url)
+        return source_etree, encoding
