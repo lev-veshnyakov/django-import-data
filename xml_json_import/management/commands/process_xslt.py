@@ -44,10 +44,7 @@ class Command(BaseCommand):
                 if options['save']:
                     saved_objects_count = 0
                     for model_element in transformed_etree.xpath('//model'):
-                        application_name, model_name = model_element.attrib['model'].split('.')
-                        models_import_str = application_name + '.models'
-                        models = importlib.import_module(models_import_str)
-                        model = getattr(models, model_name)
+                        model = self.get_model(model_element.attrib['model'])
                         for item_element in model_element.xpath('.//item'):
                             obj = model()
                             for field_element in item_element.xpath('.//field'):
@@ -57,20 +54,30 @@ class Command(BaseCommand):
                                     fk_element.attrib['model'], 
                                     fk_element.attrib['key']
                                 )
-                                _application_name, _model_name = fk_element.attrib['model'].split('.')
-                                _models_import_str = _application_name + '.models'
-                                _models = importlib.import_module(_models_import_str)
-                                _model = getattr(_models, _model_name)
-                                fk_obj = _model()
+                                fk_model = self.get_model(fk_element.attrib['model'])
+                                fk_obj = fk_model()
                                 fk_item_element = transformed_etree.xpath(fk_item_element_selector)[0]
                                 for field_element in fk_item_element.xpath('.//field'):
                                     setattr(fk_obj, field_element.attrib['name'], field_element.text)
                                 fk_obj.save()
                                 for field in model._meta.get_fields():
-                                    if field.related_model == _model:
+                                    if field.related_model == fk_model:
                                         setattr(obj, field.name, fk_obj)
                             obj.save()
                             saved_objects_count += 1
                     print 'Saved objects: ' + str(saved_objects_count)
             except etree.DocumentInvalid as ex:
                 print 'Document is not valid: ' + str(ex)
+    
+    def get_model(self, model_path_string):
+        '''
+        Returns model object by string, containing its path
+        
+        Path is in format: application_name.ModelName
+        The same format like by manage.py dumpdata
+        '''
+        application_name, model_name = model_path_string.split('.')
+        models_import_str = application_name + '.models'
+        models = importlib.import_module(models_import_str)
+        model = getattr(models, model_name)
+        return model
