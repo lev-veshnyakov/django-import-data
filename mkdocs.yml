@@ -1,0 +1,8 @@
+site_name: Django data import
+repo_url: https://github.com/lev-veshnyakov/django-data-import
+site_author: Lev Veshnyakov
+theme: readthedocs
+docs_dir: docs
+dev_addr: 0.0.0.0:80
+pages:
+  - 'Home': index.md
