@@ -3,3 +3,6 @@
 *.pyc
 !/xml_json_import/
 !/.gitignore
+!/*.md
+!/mkdocs.yml
+!/docs
