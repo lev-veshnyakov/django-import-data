@@ -1,4 +1,4 @@
-# Django import
+# Django data import
 
 **Django data import** is a command-line tool for importing XML and HTML data to django models via XSLT mapping.
 
@@ -22,10 +22,10 @@ First you need to install dependencies for lxml library:
 sudo apt-get install libxml2-dev libxslt-dev python-dev
 ```
 
-Then install django-import using pip:
+Then install django-data-import using pip:
 
 ```bash
-pip install django-import
+pip install django-data-import
 ```
 
 If you want the latest version you can install it from Github:
