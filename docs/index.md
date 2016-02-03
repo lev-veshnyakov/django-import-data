@@ -158,3 +158,71 @@ You can even omit filling that attribute if you don't have related items.
 
 **But one case is special**. That's when you don't have any unique attributes in the source. In that case you can use `generate-id(..)` XPath function.
 It will generate unique IDs for every separate XML node in the source.
+
+## Examples
+
+### Save data to one model
+
+In this simple example we will parse the main page of [stackoverflow.com](http://stackoverflow.com/) and save titles of recent questions to this model:
+
+```python
+from django.db import models
+
+class Question(models.Model):
+    title = models.CharField(max_length=255)
+```
+
+First we need to write an XSLT file:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<mapping xsl:version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <model model="test_app.Question">
+        <xsl:for-each select="//a[@class='question-hyperlink']">
+            <item key="">
+                <field name="title">
+                    <xsl:value-of select="."/>
+                </field>
+            </item>
+        </xsl:for-each>
+    </model>
+</mapping>
+```
+
+Name it transform.xslt and perform the following command:
+
+```bash
+python manage.py process_xslt http://stackoverflow.com/questions transform.xslt --validate
+```
+
+The output will be like this (but longer):
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<mapping>
+  <model model="xml_json_import.Article">
+    <item key="">
+      <field name="title">customizing soap response attribute format</field>
+    </item>
+    <item key="">
+      <field name="title">Second fragment loaded but not visible on screen</field>
+    </item>
+    <item key="">
+      <field name="title">django-oscar :first time use "python manage.py migrate" gets error</field>
+    </item>
+    <item key="">
+      <field name="title">JTable fireTableDataChanged() method doesn't refresh table</field>
+    </item>
+    <item key="">
+      <field name="title">why the dynamic nodes dont respond to click in jstree?</field>
+    </item>
+    <item key="">
+      <field name="title">Connecting kdb+ to R</field>
+    </item>
+  </model>
+</mapping>
+```
+
+Parameter `--validate` adds to output `Document is valid`.
+
+To save the result add the parameter `--save` to the command above.
