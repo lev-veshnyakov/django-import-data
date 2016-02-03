@@ -134,7 +134,9 @@ class Command(BaseCommand):
         
         file:// schema is also supported
         '''
-        response = urllib2.urlopen(url)
+        headers = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; rv:44.0) Gecko/20100101 Firefox/44.0' }
+        req = urllib2.Request('http://stackoverflow.com', None, headers)
+        response = urllib2.urlopen(req)
         encoding = response.headers.getparam('charset')
         content_type = response.info().type
         if 'xml' in content_type:
