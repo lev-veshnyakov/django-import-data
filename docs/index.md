@@ -226,3 +226,144 @@ The output will be like this (but longer):
 Parameter `--validate` adds to output `Document is valid`.
 
 To save the result add the parameter `--save` to the command above.
+
+### Save data to related models
+
+Use the same source and add two other models with foreign keys:
+
+```python
+class Question(models.Model):
+    title = models.CharField(max_length=255)
+    user = models.ForeignKey('User', null=True)
+    tags = models.ManyToManyField('Tag')
+    
+class Tag(models.Model):
+    title = models.CharField(max_length=255)
+    
+class User(models.Model):
+    title = models.CharField(max_length=255)
+```
+
+The XSLT file will be like following:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<mapping xsl:version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+    <model model="test_app.Question">
+        <xsl:for-each select="//div[@class='question-summary narrow']">
+            <item key="">
+                <field name="title">
+                    <xsl:value-of select=".//a[@class='question-hyperlink']"/>
+                </field>
+                <fk model="test_app.User">
+                    <xsl:attribute name="key">
+                        <xsl:value-of select="generate-id(.//div[@class='started']/a[2])"/>
+                    </xsl:attribute>
+                </fk>
+                <xsl:for-each select=".//a[@class='post-tag']">
+                    <m2mk model="test_app.Tag">
+                        <xsl:attribute name="key">
+                            <xsl:value-of select="generate-id(.)"/>
+                        </xsl:attribute>
+                    </m2mk>
+                </xsl:for-each>
+            </item>
+        </xsl:for-each>
+    </model>
+    
+    <model model="test_app.Tag">
+        <xsl:for-each select="//a[@class='post-tag']">
+            <item>
+                <xsl:attribute name="key">
+                    <xsl:value-of select="generate-id(.)"/>
+                </xsl:attribute>
+                <field name="title">
+                    <xsl:value-of select="."/>
+                </field>
+            </item>
+        </xsl:for-each>
+    </model>
+    
+    <model model="test_app.User">
+        <xsl:for-each select="//div[@class='started']/a[2]">
+            <item>
+                <xsl:attribute name="key">
+                    <xsl:value-of select="generate-id(.)"/>
+                </xsl:attribute>
+                <field name="title">
+                    <xsl:value-of select="."/>
+                </field>
+            </item>
+        </xsl:for-each>
+    </model>
+</mapping>
+```
+
+Take notice how calculated attributes are set and how to use generate-id function. 
+In tis example we use both types of relationship: one-to-many and many-to-many. 
+This means that one question can have several tags, but only one related user
+(which has changed the question last).
+
+The output will be like following (but essential longer):
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<mapping>
+  <model model="test_app.Question">
+    <item key="">
+      <field name="title">C TCP Server doesn't send data before closing</field>
+      <fk model="test_app.User" key="idp1407668180"/>
+      <m2mk model="test_app.Tag" key="idp1407657924"/>
+      <m2mk model="test_app.Tag" key="idp1407659948"/>
+      <m2mk model="test_app.Tag" key="idp1407660732"/>
+      <m2mk model="test_app.Tag" key="idp1407661540"/>
+    </item>
+    <item key="">
+      <field name="title">Ninject Factory Extension</field>
+      <fk model="test_app.User" key="idp1407665492"/>
+      <m2mk model="test_app.Tag" key="idp1407676788"/>
+      <m2mk model="test_app.Tag" key="idp1407674900"/>
+      <m2mk model="test_app.Tag" key="idp1407678572"/>
+      <m2mk model="test_app.Tag" key="idp1407678508"/>
+      <m2mk model="test_app.Tag" key="idp1407652988"/>
+    </item>
+  <model model="test_app.Tag">
+    <item key="idp1407657924">
+      <field name="title">c</field>
+    </item>
+    <item key="idp1407659948">
+      <field name="title">linux</field>
+    </item>
+    <item key="idp1407660732">
+      <field name="title">sockets</field>
+    </item>
+    <item key="idp1407661540">
+      <field name="title">tcp</field>
+    </item>
+    <item key="idp1407676788">
+      <field name="title">c#</field>
+    </item>
+    <item key="idp1407674900">
+      <field name="title">dependency-injection</field>
+    </item>
+    <item key="idp1407678572">
+      <field name="title">ninject</field>
+    </item>
+    <item key="idp1407678508">
+      <field name="title">ninject.web.mvc</field>
+    </item>
+    <item key="idp1407652988">
+      <field name="title">ninject-extensions</field>
+    </item>
+  </model>
+  <model model="test_app.User">
+    <item key="idp1407668180">
+      <field name="title">user3809727</field>
+    </item>
+    <item key="idp1407665492">
+      <field name="title">user2119597</field>
+    </item>
+  </model>
+</mapping>
+```
+
