@@ -1,6 +1,6 @@
 # Django import
 
-**Django data import** is a command-line tool for importing HTML, XML and JSON data to django models via XSLT mapping.
+**Django data import** is a command-line tool for importing XML and HTML data to django models via XSLT mapping.
 
 Source code is located here - [https://github.com/lev-veshnyakov/django-data-import](https://github.com/lev-veshnyakov/django-data-import).
 
