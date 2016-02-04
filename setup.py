@@ -17,7 +17,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-    name='django-data-import',
+    name='django-import-data',
 
     # Versions should comply with PEP440.  For a discussion on single-sourcing
     # the version across setup.py and the project code, see
@@ -28,7 +28,7 @@ setup(
     long_description=long_description,
 
     # The project's main homepage.
-    url='https://github.com/lev-veshnyakov/django-data-import',
+    url='https://github.com/lev-veshnyakov/django-import-data',
 
     # Author details
     author='Lev Veshnyakov',
@@ -62,7 +62,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=find_packages(exclude=['data_import.migrations']),
+    packages=find_packages(exclude=['import_data.migrations']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
@@ -78,6 +78,6 @@ setup(
     # installed, specify them here.  If using Python 2.6 or less, then these
     # have to be included in MANIFEST.in as well.
     package_data={
-        'data_import': ['schema.rng'],
+        'import_data': ['schema.rng'],
     },
 )

@@ -1,5 +1,5 @@
-site_name: Django data import
-repo_url: https://github.com/lev-veshnyakov/django-data-import
+site_name: Django import data
+repo_url: https://github.com/lev-veshnyakov/django-import-data
 site_author: Lev Veshnyakov
 theme: readthedocs
 docs_dir: docs

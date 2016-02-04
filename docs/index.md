@@ -1,12 +1,12 @@
-# Django data import
+# Django import data
 
-**Django data import** is a command-line tool for importing XML and HTML data to django models via XSLT mapping.
+**Django import data** is a command-line tool for importing XML and HTML data to django models via XSLT mapping.
 
-Source code is located here - [https://github.com/lev-veshnyakov/django-data-import](https://github.com/lev-veshnyakov/django-data-import).
+Source code is located here - [https://github.com/lev-veshnyakov/django-import-data](https://github.com/lev-veshnyakov/django-import-data).
 
 ## Basic features
 
-Django data import can take any XML or HTML source file or URL as an input and save entities from it to the django models without need to modify an existing code.
+Django import data can take any XML or HTML source file or URL as an input and save entities from it to the django models without need to modify an existing code.
 
 It also supports saving of a related data in form one-to-many and many-to-many.
 
@@ -22,21 +22,21 @@ First you need to install dependencies for lxml library:
 sudo apt-get install libxml2-dev libxslt-dev python-dev
 ```
 
-Then install django-data-import using pip:
+Then install django-import-data using pip:
 
 ```bash
-pip install django-data-import
+pip install django-import-data
 ```
 
 If you want the latest version you can install it from Github:
 
 ```bash
-pip install git+https://github.com/lev-veshnyakov/django-data-import
+pip install git+https://github.com/lev-veshnyakov/django-import-data
 ```
 
 ## Usage
 
-**Django data import** is a management command-line tool, that can be used from the code as well.
+**Django import data** is a management command-line tool, that can be used from the code as well.
 
 Too see the list of console commands type:
 
@@ -93,9 +93,9 @@ Moreover, you have to know what an XML Schema is and a particular schema languag
 
 ### XML Schema and RELAX NG
 
-**Django data import** uses RELAX NG to validate resuls of transformations. That means if you write XSLT file wrong, it wouldn't be accepted.
+**Django import data** uses RELAX NG to validate resuls of transformations. That means if you write XSLT file wrong, it wouldn't be accepted.
 
-But you dont have to write RELAX NG schema yoursef, it's already [included in the module](https://github.com/lev-veshnyakov/django-data-import/tree/master/data_import/schema.rng).
+But you dont have to write RELAX NG schema yoursef, it's already [included in the module](https://github.com/lev-veshnyakov/django-import-data/tree/master/data_import/schema.rng).
 
 ### Resulting XML
 
@@ -141,7 +141,7 @@ which sets the name of a related model field.
 
 ### Foreign keys
 
-**Django data import** supports import of related entities in the form one-to-many and many-to-many. To save such entities your models should have
+**Django import data** supports import of related entities in the form one-to-many and many-to-many. To save such entities your models should have
 appropriate foreign keys.
 
 In a resulting XML you can use `<fk/>` and `<m2m/>` elements (see above). They have `model=""` and `key=""` attributes, pointing to the related `<item/>`

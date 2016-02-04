@@ -2,5 +2,5 @@ include README.md
 include mkdocs.yml
 recursive-include docs *
 include LICENSE
-exclude data_import/models.py
-exclude data_import/tests.py
+exclude import_data/models.py
+exclude import_data/tests.py
