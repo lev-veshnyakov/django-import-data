@@ -62,7 +62,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=['data_import'],
+    packages=find_packages(exclude=['data_import.migrations']),
 
     # Alternatively, if you want to distribute just a my_module.py, uncomment
     # this:
@@ -73,4 +73,11 @@ setup(
     # requirements files see:
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=['lxml'],
+    
+     # If there are data files included in your packages that need to be
+    # installed, specify them here.  If using Python 2.6 or less, then these
+    # have to be included in MANIFEST.in as well.
+    package_data={
+        'data_import': ['schema.rng'],
+    },
 )
