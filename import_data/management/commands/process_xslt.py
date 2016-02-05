@@ -28,8 +28,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         source_etree, encoding = self.load_source_by_url(options['url'])
         transformed_etree = self.xslt_transform(source_etree, options['xslt_file'])
-        output = etree.tostring(transformed_etree, pretty_print=True, encoding=encoding)
-        print '<?xml version="1.0" encoding="' + (encoding or '') + '"?>\n' + output
+        self.print_xml(transformed_etree, encoding)
         if options['validate'] or options['save']:
             try:
                 self.assert_valid_rng_schema(transformed_etree, options['rng_file'])
@@ -181,3 +180,7 @@ class Command(BaseCommand):
         '''
         params = {field_element.attrib['name']: field_element.text}
         return not model.objects.filter(**params).count()
+        
+    def print_xml(self, xml_etree, encoding):
+        output = etree.tostring(xml_etree, pretty_print=True, encoding=encoding)
+        print '<?xml version="1.0" encoding="' + (encoding or '') + '"?>\n' + output
