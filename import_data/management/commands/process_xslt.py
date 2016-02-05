@@ -147,7 +147,7 @@ def load_source_by_url(url):
         source_etree = html.parse(response)
     elif 'json' in content_type:
         dictionary = json.load(response)
-        source_etree = dicttoxml(dictionary)
+        source_etree = etree.fromstring(dicttoxml(dictionary))
     else:
         raise Exception('Unsupported content type for source URL ' + url)
     return source_etree, encoding
