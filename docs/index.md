@@ -34,6 +34,15 @@ If you want the latest version you can install it from Github:
 pip install git+https://github.com/lev-veshnyakov/django-import-data
 ```
 
+Add import_data to INSTALLED_APPS:
+
+```python
+INSTALLED_APPS = [
+    ...
+    'import_data',
+]
+```
+
 ## Usage
 
 **Django import data** is a management command-line tool, that can be used from the code as well.
