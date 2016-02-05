@@ -1,7 +1,7 @@
 /*
 /*/
 *.pyc
-!/xml_json_import/
+!/import_data/
 !/.gitignore
 !/*.md
 !/mkdocs.yml
@@ -9,3 +9,6 @@
 !/setup.py
 !/LICENSE
 !/MANIFEST.in
+/import_data/migrations/
+/import_data/models.py
+/import_data/tests.py
