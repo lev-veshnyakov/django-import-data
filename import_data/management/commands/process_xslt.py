@@ -4,6 +4,8 @@ import urllib2
 from os import path
 import importlib
 from django.db.models.fields import related
+from dicttoxml import dicttoxml
+import json
 
 class Command(BaseCommand):
     help = 'Processes XSLT transformation on a fetched by URL resource and outputs the result'
@@ -143,6 +145,9 @@ class Command(BaseCommand):
             source_etree = etree.parse(response)
         elif 'html' in content_type:
             source_etree = html.parse(response)
+        elif 'json' in content_type:
+            dictionary = json.load(response)
+            source_etree = dicttoxml(dictionary)
         else:
             raise Exception('Unsupported content type for source URL ' + url)
         return source_etree, encoding
