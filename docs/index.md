@@ -1,18 +1,19 @@
 # Django import data
 
-**Django import data** is a command-line tool for importing XML and HTML data to django models via XSLT mapping.
+**Django import data** is a command-line tool for importing XML, HTML or JSON data to django models via XSLT mapping.
 
 Source code is located here - [https://github.com/lev-veshnyakov/django-import-data](https://github.com/lev-veshnyakov/django-import-data).
 
 ## Basic features
 
-Django import data can take any XML or HTML source file or URL as an input and save entities from it to the django models without need to modify an existing code.
+Django import data can take any XML, HTML or JSON source file or URL as an input and save entities from it to the django models without need to modify an existing code.
 
 It also supports saving of a related data in form one-to-many and many-to-many.
 
 ## Dependencies
 
-It uses [lxml](http://lxml.de) library for all xml manipulations.
+It uses [lxml](http://lxml.de) library for all XML manipulations and [dicttoxml](https://github.com/quandyfactory/dicttoxml) library
+for the transformation from JSON to XML.
 
 ## Installation
 
@@ -69,6 +70,10 @@ python manage.py help process_xslt
 
 ```bash
 python manage.py help validate_xml
+```
+
+```bash
+python manage.py help json_to_xml
 ```
 
 To call console commands from your code use [django.core.management.call_command](https://docs.djangoproject.com/es/1.9/ref/django-admin/#running-management-commands-from-your-code):
@@ -167,6 +172,83 @@ You can even omit filling that attribute if you don't have related items.
 
 **But one case is special**. That's when you don't have any unique attributes in the source. In that case you can use `generate-id(..)` XPath function.
 It will generate unique IDs for every separate XML node in the source.
+
+### Using JSON sources
+
+It's possible to use JSON sources. Because the transformation is XSLT-based, JSON is converted to the appropriate XML.
+
+For example the following JSON code:
+
+```javascript
+{
+  "firstName": "John",
+  "lastName": "Smith",
+  "age": 25,
+  "address": {
+    "streetAddress": "21 2nd Street",
+    "city": "New York",
+    "state": "NY",
+    "postalCode": "10021"
+  },
+  "phoneNumber": [
+    {
+      "type": "home",
+      "number": "212 555-1234"
+    },
+    {
+      "type": "fax",
+      "number": "646 555-4567"
+    }
+  ],
+  "gender": {
+    "type": "male"
+  }
+}
+```
+
+will be converted to this XML:
+
+```xml
+<?xml version="1.0" encoding=""?>
+<root>
+  <firstName type="str">John</firstName>
+  <lastName type="str">Smith</lastName>
+  <age type="int">25</age>
+  <address type="dict">
+    <postalCode type="str">10021</postalCode>
+    <city type="str">New York</city>
+    <streetAddress type="str">21 2nd Street</streetAddress>
+    <state type="str">NY</state>
+  </address>
+  <phoneNumber type="list">
+    <item type="dict">
+      <type type="str">home</type>
+      <number type="str">212 555-1234</number>
+    </item>
+    <item type="dict">
+      <type type="str">fax</type>
+      <number type="str">646 555-4567</number>
+    </item>
+  </phoneNumber>
+  <gender type="dict">
+    <type type="str">male</type>
+  </gender>
+</root>
+```
+
+That XML is supposed to be used for writing an XSLT transformation. 
+
+If you use some JSON source and want to find out which XML is related for it, then use 
+the command:
+
+```bash
+python manage.py json_to_xml <URL>
+```
+
+After writing an XSLT transformation file you can use `process_xslt` specifying the URL of the JSON source.
+
+JSON to XML transformations is performed by dicttoxml library written by Ryan McGreal 
+[https://github.com/quandyfactory/dicttoxml](https://github.com/quandyfactory/dicttoxml).
 
 ## Examples
 

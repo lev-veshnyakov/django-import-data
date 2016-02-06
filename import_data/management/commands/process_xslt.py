@@ -11,7 +11,7 @@ class Command(BaseCommand):
     help = 'Processes XSLT transformation on a fetched by URL resource and outputs the result'
 
     def add_arguments(self, parser):
-        parser.add_argument('url', help='URL to fetch source XML')
+        parser.add_argument('url', help='URL to fetch source XML, HTML or JSON')
         parser.add_argument('xslt_file', help='Path to XSLT transformation file')
         parser.add_argument('--validate', action='store_true', 
                              help='Validate against Relax NG schema after transformation')
