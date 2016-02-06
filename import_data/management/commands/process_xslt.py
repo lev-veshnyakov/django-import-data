@@ -1,6 +1,17 @@
+from __future__ import absolute_import
+from __future__ import division
+from __future__ import print_function
+from __future__ import unicode_literals
+
 from django.core.management.base import BaseCommand
 from lxml import etree, html
-import urllib2
+
+try:
+    # in python 3 urllib2 is merged into urllib
+    import urllib.request as urllib2
+except ImportError:
+    import urllib2
+    
 from os import path
 import importlib
 from django.db.models.fields import related
@@ -32,7 +43,7 @@ class Command(BaseCommand):
         if options['validate'] or options['save']:
             try:
                 assert_valid_rng_schema(transformed_etree, options['rng_file'])
-                print 'Document is valid'
+                print('Document is valid')
                 if options['save']:
                     saved_objects_count = 0
                     for model_element in get_model_elements(transformed_etree):
@@ -52,9 +63,9 @@ class Command(BaseCommand):
                                     related_obj = save_related_item(m2m_element)
                                     set_related(obj, related_obj)
                                 saved_objects_count += 1
-                    print 'Saved objects: ' + str(saved_objects_count)
+                    print('Saved objects: ' + str(saved_objects_count))
             except etree.DocumentInvalid as ex:
-                print 'Document is not valid: ' + str(ex)
+                print('Document is not valid: ' + str(ex))
 
     
 def get_model(model_path_string):
@@ -139,8 +150,13 @@ def load_source_by_url(url):
     headers = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; rv:44.0) Gecko/20100101 Firefox/44.0' }
     req = urllib2.Request(url, None, headers)
     response = urllib2.urlopen(req)
-    encoding = response.headers.getparam('charset')
-    content_type = response.info().type
+    try:
+        # does not work in python 3
+        encoding = response.headers.getparam('charset')
+        content_type = response.info().type
+    except AttributeError:
+        encoding = response.headers.get_content_charset()
+        content_type = response.headers.get_content_type()
     if 'xml' in content_type:
         source_etree = etree.parse(response)
     elif 'html' in content_type:
@@ -184,4 +200,4 @@ def is_unique(model, field_element):
     
 def print_xml(xml_etree, encoding):
     output = etree.tostring(xml_etree, pretty_print=True, encoding=encoding)
-    print '<?xml version="1.0" encoding="' + (encoding or '') + '"?>\n' + output
+    print('<?xml version="1.0" encoding="' + (encoding or '') + '"?>\n' + output.decode(encoding))
