@@ -22,7 +22,7 @@ class ImportDataException(Exception):
     pass
 
 class Command(BaseCommand):
-    help = 'Processes XSLT transformation on a fetched by URL resource and outputs the result'
+    help = 'Processes XSLT transformation on a fetched by URL resource and outputs, validates or saves the result'
 
     def add_arguments(self, parser):
         parser.add_argument('url', help='File path or an URL of XML, HTML or JSON source')
@@ -44,7 +44,8 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         source_etree, encoding = load_source_by_url(options['url'])
         transformed_etree = xslt_transform(source_etree, options['xslt_file'])
-        print_xml(transformed_etree, encoding or options['encoding'])
+        if not options['validate'] and not options['save']:
+            print_xml(transformed_etree, encoding or options['encoding'])
         if options['validate'] or options['save']:
             try:
                 assert_valid_rng_schema(transformed_etree, options['rng_file'])
