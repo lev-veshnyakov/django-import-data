@@ -54,10 +54,10 @@ Too see the list of console commands type:
 python manage.py help
 ```
 
-In the output you will find data_import section like below:
+In the output you will find import_data section like below:
 
 ```bash
-[data_import]
+[import_data]
     process_xslt
     validate_xml
 ```
@@ -109,7 +109,7 @@ Moreover, you have to know what an XML Schema is and a particular schema languag
 
 **Django import data** uses RELAX NG to validate resuls of transformations. That means if you write XSLT file wrong, it wouldn't be accepted.
 
-But you dont have to write RELAX NG schema yoursef, it's already [included in the module](https://github.com/lev-veshnyakov/django-import-data/tree/master/data_import/schema.rng).
+But you dont have to write RELAX NG schema yoursef, it's already [included in the module](https://github.com/lev-veshnyakov/django-import-data/tree/master/import_data/schema.rng).
 
 ### Resulting XML
 
