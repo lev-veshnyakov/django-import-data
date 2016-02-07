@@ -11,7 +11,7 @@ try:
     import urllib.request as urllib2
 except ImportError:
     import urllib2
-    
+    # TODO: try requests instead of urllib2
 from os import path
 import importlib
 from django.db.models.fields import related
@@ -172,7 +172,12 @@ def load_source_by_url(url):
     elif 'html' in content_type:
         source_etree = html.parse(response)
     elif 'json' in content_type:
-        dictionary = json.load(response)
+        try:
+            # python 3 does not support binary string here
+            dictionary = json.load(response)
+        except TypeError:
+            response.seek(0)
+            dictionary = json.loads(response.read().decode('utf-8'))
         source_etree = etree.fromstring(dicttoxml(dictionary))
     else:
         raise Exception('Unsupported content type for source URL ' + url)
