@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mapping>
+    <model model="app.Author">
+        <item key="1">
+            <field name="name">Andrew Tanenbaum</field>
+        </item>
+        <item key="2">
+            <field name="name">Donald Knuth</field>
+        </item>
+    </model>
+    <model model="app.Book">
+        <item key="1">
+            <field name="name">Computer Networks</field>
+            <field name="ISBN">0130661023</field>
+            <fk model="app.Author" key="1"/>
+        </item>
+        <item key="2">
+            <field name="name">The Art of Computer Programming</field>
+            <field name="ISBN">0321751043</field>
+            <m2mk model="app.Author" key="2"/>
+        </item>
+    </model>
+</mapping>

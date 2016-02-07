@@ -9,6 +9,3 @@
 !/setup.py
 !/LICENSE
 !/MANIFEST.in
-/import_data/migrations/
-/import_data/models.py
-/import_data/tests.py
