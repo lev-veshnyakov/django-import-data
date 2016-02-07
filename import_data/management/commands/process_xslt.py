@@ -211,4 +211,4 @@ def is_unique(model, field_element):
 def print_xml(xml_etree, encoding, command_instance=None):
     output = etree.tostring(xml_etree, pretty_print=True, encoding=encoding)
     print_method = command_instance.stdout.write if command_instance else print
-    print_method(b'<?xml version="1.0" encoding="{}"?>\n{}'.format(encoding, output))
+    print_method('<?xml version="1.0" encoding="{}"?>\n{}'.format(encoding, output.decode(encoding)))
