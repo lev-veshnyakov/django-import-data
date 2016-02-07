@@ -24,6 +24,8 @@ class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument('url', help='URL to fetch source XML, HTML or JSON')
         parser.add_argument('xslt_file', help='Path to XSLT transformation file')
+        parser.add_argument('--encoding', help='Encoding of a source file. Content-type HTTP header is used to '
+                                               'detect it. For local files it defaults to UTF-8', default='UTF-8')
         parser.add_argument('--validate', action='store_true', 
                              help='Validate against Relax NG schema after transformation')
         rng_file = path.join(path.dirname(path.dirname(path.dirname(path.abspath(__file__)))), 'schema.rng')
@@ -39,7 +41,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         source_etree, encoding = load_source_by_url(options['url'])
         transformed_etree = xslt_transform(source_etree, options['xslt_file'])
-        print_xml(transformed_etree, encoding)
+        print_xml(transformed_etree, encoding or options['encoding'])
         if options['validate'] or options['save']:
             try:
                 assert_valid_rng_schema(transformed_etree, options['rng_file'])
