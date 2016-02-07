@@ -16,4 +16,4 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         etree, encoding = process_xslt.load_source_by_url(options['url'])
-        process_xslt.print_xml(etree, encoding or options['encoding'])
+        process_xslt.print_xml(etree, encoding or options['encoding'], self)

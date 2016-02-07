@@ -45,11 +45,11 @@ class Command(BaseCommand):
         source_etree, encoding = load_source_by_url(options['url'])
         transformed_etree = xslt_transform(source_etree, options['xslt_file'])
         if not options['validate'] and not options['save']:
-            print_xml(transformed_etree, encoding or options['encoding'])
+            print_xml(transformed_etree, encoding or options['encoding'], self)
         if options['validate'] or options['save']:
             try:
                 assert_valid_rng_schema(transformed_etree, options['rng_file'])
-                print('Document is valid')
+                self.stdout.write('Document is valid')
                 if options['save']:
                     saved_objects_count = 0
                     for model_element in get_model_elements(transformed_etree):
@@ -69,10 +69,9 @@ class Command(BaseCommand):
                                     related_obj = save_related_item(m2m_element)
                                     set_related(obj, related_obj)
                                 saved_objects_count += 1
-                    print('Saved objects: ' + str(saved_objects_count))
+                    self.stdout.write('Saved objects: ' + str(saved_objects_count))
             except etree.DocumentInvalid as ex:
-                print('Document is not valid: ' + str(ex))
-
+                self.stdout.write('Document is not valid: ' + str(ex))
     
 def get_model(model_path_string):
     '''
@@ -209,6 +208,7 @@ def is_unique(model, field_element):
     params = {field_element.attrib['name']: field_element.text}
     return not model.objects.filter(**params).count()
     
-def print_xml(xml_etree, encoding):
+def print_xml(xml_etree, encoding, command_instance=None):
     output = etree.tostring(xml_etree, pretty_print=True, encoding=encoding)
-    print(b'<?xml version="1.0" encoding="{}"?>\n{}'.format(encoding, output))
+    print_method = command_instance.stdout.write if command_instance else print
+    print_method(b'<?xml version="1.0" encoding="{}"?>\n{}'.format(encoding, output))
