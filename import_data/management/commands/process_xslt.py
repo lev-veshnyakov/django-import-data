@@ -18,12 +18,15 @@ from django.db.models.fields import related
 from dicttoxml import dicttoxml
 import json
 
+class ImportDataException(Exception):
+    pass
+
 class Command(BaseCommand):
     help = 'Processes XSLT transformation on a fetched by URL resource and outputs the result'
 
     def add_arguments(self, parser):
-        parser.add_argument('url', help='URL to fetch source XML, HTML or JSON')
-        parser.add_argument('xslt_file', help='Path to XSLT transformation file')
+        parser.add_argument('url', help='File path or an URL of XML, HTML or JSON source')
+        parser.add_argument('xslt_file', help='Path to an XSLT transformation file')
         parser.add_argument('--encoding', help='Encoding of a source file. Content-type HTTP header is used to '
                                                'detect it. For local files it defaults to UTF-8', default='UTF-8')
         parser.add_argument('--validate', action='store_true', 
@@ -150,6 +153,11 @@ def load_source_by_url(url):
     file:// schema is also supported
     '''
     headers = { 'User-Agent' : 'Mozilla/5.0 (Windows NT 6.1; rv:44.0) Gecko/20100101 Firefox/44.0' }
+    if '://' not in url:
+        if path.isfile(url):
+            url = 'file://' + path.abspath(url)
+        else:
+            raise ImportDataException('File "' + url + '" does not exisis')
     req = urllib2.Request(url, None, headers)
     response = urllib2.urlopen(req)
     try:
